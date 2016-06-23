@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.work.midori"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+
+    <permission android:name="com.work.midori.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.work.midori.permission.C2D_MESSAGE"/>
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        tools:replace="android:icon"
+        android:theme="@style/AppTheme"
+        android:name="android.support.multidex.MultiDexApplication">
+        <activity
+            android:name="com.work.midori.Main.PrecursorActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.work.midori.Main.MainActivity"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name="com.work.midori.Actionbar.PartnerActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name="com.work.midori.Products.HomeEquipment.HomeEquipmentActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name="com.work.midori.Products.RecycledWater.RecycledWaterActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name="com.work.midori.Products.WaterTreatment.WaterTreatmentActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name="com.work.midori.Products.WaterTreatmentRecycle.WaterTreatmentRecycleActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name="com.work.midori.Seller.SellerInfomationActivity"
+                  android:screenOrientation="portrait"/>
+
+        <meta-data android:name="com.google.android.gms.version"
+                   android:value="@integer/google_play_services_version" />
+
+
+        <receiver android:name="com.onesignal.GcmBroadcastReceiver"
+                  android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.work.midori" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.onesignal.NotificationOpenedReceiver" />
+        <service android:name="com.onesignal.GcmIntentService" />
+        <service android:name="com.onesignal.SyncService" android:stopWithTask="false" />
+
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f668f80c0ff11376abc1fbeaee4f437faba30b30" />
+    </application>
+
+
+</manifest>

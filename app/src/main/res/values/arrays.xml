@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer-array name="product_image">
+        <item>@mipmap/innerbanner1</item>
+        <item>@mipmap/innerbanner2</item>
+        <item>@mipmap/innerbanner3</item>
+        <item>@mipmap/innerbanner4</item>
+    </integer-array>
+
+    <string-array name="product_Name">
+        <item>全戶式水處理裝置</item>
+        <item>循環水處理裝置</item>
+        <item>無藥劑水處理裝置</item>
+        <item>無藥劑循環水淨化裝置</item>
+    </string-array>
+
+    <string-array name="product_content">
+        <item>1.建築物水管，管線水垢防止及防鏽。\n2.冷卻水塔循環水管線清潔防鏽。</item>
+        <item>防止水垢附著，水垢的剝離，防止管線腐蝕，管壁上黏液的去除。</item>
+        <item>無藥劑水淨化裝置，運用嶄新的電器分解技術，完全不使用藥品。</item>
+        <item>1.除去冷卻塔迴圈水裡的汙垢。\n2.防止管路與設備鏽蝕。\n3.節約上下水道用水，節省水費。</item>
+    </string-array>
+
+    <string-array name="SellInfomation" >
+        <item>@array/吳宜聰</item>
+        <item>@array/阿里故</item>
+    </string-array>
+
+    <string-array name="吳宜聰" >
+        <item name="Name">吳宜聰  Wu Yo Kun</item>
+        <item name="Position">總經理</item>
+        <item name="Email">wateractivator@gmail.com</item>>
+        <item name="Photo">sword</item>
+        <item name="PhoneNumber">0932301898</item>
+    </string-array>
+
+    <string-array name="阿里故" >
+        <item name="Name">阿里故 Aleigood</item>
+        <item name="Position">執行長</item>
+        <item name="Email">wateractivator@gmail.com</item>>
+        <item name="Photo">sword</item>
+        <item name="PhoneNumber">0932111111</item>
+    </string-array>
+
+
+</resources>

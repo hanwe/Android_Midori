@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.work.midori.Main.MainActivity">
+
+    <item
+        android:id="@+id/action_order"
+        android:icon="@mipmap/handshake"
+        android:orderInCategory="1"
+        android:title="@string/order_partner"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_facebook"
+        android:orderInCategory="2"
+        android:title="@string/facebook"
+        android:icon="@mipmap/facebook"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="2"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+</menu>

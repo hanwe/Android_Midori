@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="MidoriBackgroundcolor">#00A2E8</color>>
+    <color name="block">#000000</color>>
+    <color name="sellerbg">#bdf1ff</color>
+    <color name="lightgrey">#d3d3d3</color>
+
+</resources>
