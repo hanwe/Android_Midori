@@ -1,12 +1,16 @@
 package com.work.midori.Main;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
@@ -24,11 +28,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.onesignal.OneSignal;
-import com.work.midori.AWS.AWSMobileClient;
-import com.work.midori.AWS.user.IdentityManager;
 import com.work.midori.Actionbar.PartnerActivity;
-import com.work.midori.GCM.PushListenerService;
 import com.work.midori.Main.Adapter.MianCardAdapter;
 import com.work.midori.Products.HomeEquipment.HomeEquipmentActivity;
 import com.work.midori.Products.RecycledWater.RecycledWaterActivity;
@@ -40,7 +45,6 @@ import com.work.midori.Util.Configuration;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.*;
-//import com.microsoft.windowsazure.notifications.NotificationsManager;
 
 import org.json.JSONObject;
 
@@ -54,11 +58,10 @@ public class MainActivity extends AppCompatActivity
 
     private ArrayList<ProductsInfomationClass> mProductList;
 
-    public static MainActivity mainActivity;
+    public Context context;
     public static Boolean isVisible = false;
     private GoogleCloudMessaging gcm;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private IdentityManager identityManager;
     private int iNotificationIndex = 1;
 
     private MianCardAdapter.OnMainItemClickListener onItemClickListener = new MianCardAdapter.OnMainItemClickListener()
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
+//        toolbar.setTitle("");
         toolbar.setLogo(R.mipmap.logo);
 
         setSupportActionBar(toolbar);
@@ -128,8 +131,7 @@ public class MainActivity extends AppCompatActivity
 //                        .setAction("Action", null).show();
             }
         });
-
-        mainActivity = this;
+        context = this;
 //        NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, GCMHandler.class);
 //        registerWithNotificationHubs();
 
@@ -139,18 +141,13 @@ public class MainActivity extends AppCompatActivity
 
         initData();
         initLayout();
-        initAws();
+        iniFirbase();
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        final AWSMobileClient awsMobileClient = AWSMobileClient.defaultMobileClient();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(notificationReceiver,
-                                                                 new IntentFilter(PushListenerService.ACTION_SNS_NOTIFICATION));
     }
 
     private class PushNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler
@@ -198,60 +195,8 @@ public class MainActivity extends AppCompatActivity
             {
                 t.printStackTrace();
             }
-
-            // The following can be used to open an Activity of your choose.
-      /*
-      Intent intent = new Intent(getApplication(), YourActivity.class);
-      intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-      startActivity(intent);
-      */
-            // Follow the insturctions in the link below to prevent the launcher Activity from starting.
-            // https://documentation.onesignal.com/docs/android-notification-customizations#changing-the-open-action-of-a-notification
         }
     }
-
-    private final BroadcastReceiver notificationReceiver = new BroadcastReceiver()
-
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-
-            Bundle data = intent.getBundleExtra(PushListenerService.INTENT_SNS_NOTIFICATION_DATA);
-            String message = PushListenerService.getMessage(data);
-
-//            new AlertDialog.Builder(MainActivity.this)
-//                    .setTitle("Midori")
-//                    .setMessage(message)
-//                    .setPositiveButton(android.R.string.ok, null)
-//                    .show();
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE );
-            Notification.Builder builder = new Notification.Builder(MainActivity.this );
-            PendingIntent contentIndent = PendingIntent.getActivity(MainActivity. this, 0, new Intent(MainActivity.this, MainActivity. class), PendingIntent. FLAG_UPDATE_CURRENT);
-
-            builder.setContentIntent(contentIndent)
-                   .setSmallIcon(R.mipmap.ic_launcher)
-                   // 設置狀態列裡面的圖示（小圖示）　　　　　　　　　　　
-                   .setLargeIcon(BitmapFactory. decodeResource(getResources(), R.mipmap.ic_launcher)) // 下拉下拉清單裡面的圖示（大圖示）
-                   .setTicker(message) // 設置狀態列的顯示的資訊
-                   .setAutoCancel(false) // 設置可以清除
-                   .setContentTitle( "Midori ") // 設置下拉清單裡的標題
-                   .setContentText(message); // 設置上下文內容
-
-            Notification notification = builder.getNotification();
-
-            // notification.defaults |= Notification.DEFAULT_SOUND;
-            notification.sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.drop);
-
-//            // 振動
-//            notification.defaults |= Notification.DEFAULT_VIBRATE ; // 某些手機不支援 請加
-
-            // 加i是為了顯示多條Notification
-            notificationManager.notify(0, notification);
-            iNotificationIndex++;
-        }
-    };
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -323,12 +268,85 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void initAws()
+
+    private void iniFirbase()
     {
-        AWSMobileClient.initializeMobileClientIfNecessary(this);
-        final AWSMobileClient awsMobileClient = AWSMobileClient.defaultMobileClient();
-        identityManager = awsMobileClient.getIdentityManager();
+        //資料庫
+        Firebase.setAndroidContext(this);
+
+        Firebase myFirebaseRef = new Firebase("https://midori-1317.firebaseio.com/");
+        myFirebaseRef.child("Android_Version").addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot snapshot)
+            {
+                System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
+
+                int version = getVersionCode();
+
+                if(version < Integer.parseInt(snapshot.getValue().toString()))
+                {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Midori")
+                           .setMessage("建議您更新到最新版以獲得更多的資訊，謝謝");
+
+                    builder.setPositiveButton("更新", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            final String appPackageName = getPackageName();
+                            try
+                            {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                            }
+                            catch (android.content.ActivityNotFoundException anfe)
+                            {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                            }
+                        }
+                    });
+
+                    builder.setNegativeButton("下次", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+
+                        }
+                    });
+
+                    builder.show();
+                }
+
+
+//                ChageVersion
+
+            }
+            @Override public void onCancelled(FirebaseError error) { }
+        });
     }
+
+
+    public int getVersionCode()
+    {
+        int versionCode = -1;
+
+        PackageInfo packageInfo;
+        try
+        {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionCode= packageInfo.versionCode;
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        return versionCode;
+    }
+
 
     private boolean checkPlayServices()
     {
